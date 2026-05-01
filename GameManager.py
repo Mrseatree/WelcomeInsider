@@ -17,8 +17,12 @@ class GameManager:
             return
 
         self.player.update()
+        # 调试
+        print(f"Player:{self.player.position}")
         for enemy in self.enemies:
             enemy.update()
+            # 调试
+            print(f"Enemy:{enemy.position}")
 
         self.check_game_over()
 
