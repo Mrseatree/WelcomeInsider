@@ -1,10 +1,13 @@
+# from GameManager import GameManager
+
 class Entity:
-    def __init__(self, id, name, speed, position, game_map):
+    def __init__(self, id, name, speed, position, game_map, sense):
         self.id = id
         self.name = name
         self.speed = speed
         self.position = position
-        self.game_map=game_map
+        self.game_map = game_map
+        self.sense = sense
 
     def move(self, dx, dy):
         new_pos = [self.position[0] + dx, self.position[1] + dy]
@@ -22,10 +25,12 @@ class Player(Entity):
         super().__init__(
             id = 0,
             name = "Richele",
-            speed = 1,
+            speed = 2,
             position = [0, 0],
-            game_map = game_map
+            game_map = game_map,
+            sense = True
         )
+        self.has_second_chance = 1
 
     def update(self):
         # 从输入读取方向（先可以写死）
@@ -39,19 +44,32 @@ class Player(Entity):
         elif cmd == "d":
             self.move(1, 0)
 
+    def try_escape(self):
+        if self.has_second_chance > 0:
+            self.has_second_chance -= 1
+            print("这次混过去了呢。")
+            return True
+        return False
+
 
 class Enemy(Entity):
-    def __init__(self, game_map, player):
+    def __init__(self, game_map, player,
+                 id=1, name="Enemy", speed=1, position=[5, 5]):
         super().__init__(
-            id = 2,
-            name = "Enemy",
-            speed = 1,
-            position = [5, 5],
-            game_map = game_map
+            id=id,
+            name=name,
+            speed=speed,
+            position=position,
+            game_map=game_map,
+            sense=False,
         )
         self.player = player
+        self.vision_range = 2
 
     def update(self):
+        self.chase_player()
+
+    def chase_player(self):
         # 简单AI：随机走 or 朝玩家走
         px, py = self.player.position
         ex, ey = self.position
@@ -69,3 +87,11 @@ class Enemy(Entity):
             move_y = 1 if dy > 0 else -1
 
         self.move(move_x, move_y)
+
+    def on_catch_player(self,game):
+        pass
+
+    def on_detect_player(self,game):
+        pass
+
+
